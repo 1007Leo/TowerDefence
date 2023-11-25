@@ -26,9 +26,10 @@ Point GameManager::coordToPixel(Vec2 boardCoord, Size spriteSize)
 	return res;
 }
 
-bool GameManager::loadLevel(std::string level)
+bool GameManager::loadLevel(int level)
 {
-	std::string fileName = "levels/level_" + level + ".txt";
+	unloadCurrentLevel();
+	std::string fileName = "levels/level_" + std::to_string(level) + ".txt";
 	std::ifstream levelFile(fileName);
 
 	if (levelFile.is_open())
@@ -54,6 +55,7 @@ bool GameManager::loadLevel(std::string level)
 		
 		levelFile.close();
 
+		this->levelInProgress = true;
 		return true;
 	}
 
@@ -63,7 +65,10 @@ bool GameManager::loadLevel(std::string level)
 bool GameManager::prepareWave(int waveNumber)
 {
 	if (waveNumber >= waves.size())
+	{
+		this->levelInProgress = false;
 		return false;
+	}
 
 	enemies.clear();
 
@@ -124,6 +129,12 @@ bool GameManager::prepareWave(int waveNumber)
 	return true;
 }
 
+int GameManager::nextLevel()
+{
+	this->currentLevel++;
+	return this->currentLevel;
+}
+
 Tower* GameManager::getTower()
 {
 	return &objTower;
@@ -152,6 +163,11 @@ std::vector<Wave>& GameManager::getWaves()
 int GameManager::getCurrentWave()
 {
 	return this->currentWave;
+}
+
+bool GameManager::isLevelInProgress()
+{
+	return this->levelInProgress;
 }
 
 void GameManager::update(float delta)
@@ -354,4 +370,12 @@ bool GameManager::readTower(std::ifstream& levelFile)
 	levelFile >> towerHP;
 	this->objTower.setNewHealth(towerHP);
 	return true;
+}
+
+void GameManager::unloadCurrentLevel()
+{
+	currentWave = -1;
+	levelData.clear();
+	enemies.clear();
+	waves.clear();
 }

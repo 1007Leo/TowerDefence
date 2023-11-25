@@ -56,25 +56,14 @@ bool GameScene::init()
 
     gameManager = GameManager();
 
-
-    if (!gameManager.loadLevel("1"))
-    {
-        Director::getInstance()->end();
-    }
-    else
-    {
-        if (!setLevel(gameManager))
-        {
-            Director::getInstance()->end();
-        }
-    }
-
     this->scheduleUpdate();
     return true;
 }
 
 bool GameScene::setLevel(GameManager& gameManager)
 {
+
+    this->removeAllChildren();
     std::vector< std::vector<blockTypes> >& board = gameManager.getCurrentLevelMatrix();
     std::list< std::unique_ptr<enemies::BaseEnemy> >& enemies = gameManager.getEnemies();
 
@@ -182,11 +171,26 @@ float GameScene::findScale(Size spriteSize, int rows, int cols)
 
 void GameScene::update(float delta)
 {
-    if (!setNextWaveIfNoEnemies())
-        Director::getInstance()->end();
-    showHideEnemies();
-    gameManager.update(delta);
-    
+    if (gameManager.isLevelInProgress())
+    {
+        setNextWaveIfNoEnemies();
+        showHideEnemies();
+        gameManager.update(delta);
+    }
+    else
+    {
+        if (!gameManager.loadLevel(gameManager.nextLevel()))
+        {
+            Director::getInstance()->end();
+        }
+        else
+        {
+            if (!setLevel(gameManager))
+            {
+                Director::getInstance()->end();
+            }
+        }
+    }
 }
 
 bool GameScene::setNextWaveIfNoEnemies()

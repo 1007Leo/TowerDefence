@@ -28,8 +28,9 @@ public:
 	static Vec2 pixelToCoord(Point pixelCoord, Size spriteSize);
 	static Point coordToPixel(Vec2 boardCoord, Size spriteSize);
 
-	bool loadLevel(std::string level);
+	bool loadLevel(int level);
 	bool prepareWave(int waveNumber);
+	int nextLevel();
 
 	Tower* getTower();
 	Point getEnemyStart();
@@ -38,6 +39,7 @@ public:
 	//std::list< std::unique_ptr<enemies::BaseTurret> >& getDefence();
 	std::vector< Wave >& getWaves();
 	int getCurrentWave();
+	bool isLevelInProgress();
 
 	void update(float delta);
 
@@ -45,6 +47,8 @@ private:
 	Tower objTower;
 	Point enemyStart;
 	int currentWave = -1;
+	int currentLevel = 0;
+	bool levelInProgress = false;
 	std::vector< std::vector<blockTypes> > levelData;
 	std::list< std::unique_ptr<enemies::BaseEnemy> > enemies;
 	//std::list< std::unique_ptr<enemies::BaseTurret> > defence;
@@ -57,4 +61,6 @@ private:
 	bool readMap(std::ifstream& levelFile);
 	bool readWave(std::ifstream& levelFile);
 	bool readTower(std::ifstream& levelFile);
+
+	void unloadCurrentLevel();
 };
