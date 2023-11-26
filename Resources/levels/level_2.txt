@@ -10,7 +10,7 @@ r r r r s w r w w w
 w w w w m m r w w w
 w w w w m m r r r w
 m m t w w w w w r w
-m m r r r r r r r w
+m m r w r r r r r w
 
 // r - road
 // w - wall
@@ -25,7 +25,7 @@ m m r r r r r r r w
 -wave
 0.5
 0.5
-0 3 2 5 
+0 3 0 5 
 // interval between wave in seconds
 // interval between enemies in seconds
 //(baseEnemy) (normalEnemy) (thickEnemy) (fastEnemy) count

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __GAME_SCENE_H__
 #define __GAME_SCENE_H__
 
@@ -6,7 +7,7 @@
 
 USING_NS_CC;
 
-const enum Tags { block = 0, enemy = 1 };
+const enum Tags { block = 0, enemy = 1, defence = 2, hitMark = 3};
 
 class GameScene : public cocos2d::Scene
 {

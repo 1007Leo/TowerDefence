@@ -145,7 +145,7 @@ Point GameManager::getEnemyStart()
 	return this->enemyStart;
 }
 
-std::vector<std::vector<blockTypes>>& GameManager::getCurrentLevelMatrix()
+std::vector<std::vector<BlockTypes>>& GameManager::getCurrentLevelMatrix()
 {
 	return this->levelData;
 }
@@ -153,6 +153,11 @@ std::vector<std::vector<blockTypes>>& GameManager::getCurrentLevelMatrix()
 std::list<std::unique_ptr<enemies::BaseEnemy>>& GameManager::getEnemies()
 {
 	return this->enemies;
+}
+
+std::list<std::unique_ptr<defences::BaseTurret>>& GameManager::getDefences()
+{
+	return this->defences;
 }
 
 std::vector<Wave>& GameManager::getWaves()
@@ -176,18 +181,22 @@ void GameManager::update(float delta)
 	{
 		updateEnemy(enemy.get(), delta);
 	}
+	for (auto& turret : defences)
+	{
+		turret.get()->update(enemies, delta);
+	}
 	objTower.update();
 }
 
 void GameManager::updateEnemy(enemies::BaseEnemy* enemy, float delta)
 {
-	if (enemy->getState() != enemies::enabled)
+	if (enemy->getState() != enemies::drawn)
 	{
 		return;
 	}
 	enemies::Direction moveDirection = enemy->getMoveDirection();
 
-	if (moveDirection == enemies::none)
+	if (moveDirection == enemies::Direction::none)
 	{
 		Size size = enemy->getSprite()->getContentSize();
 		float scale = enemy->getSprite()->getScale();
@@ -228,13 +237,13 @@ void GameManager::updateEnemy(enemies::BaseEnemy* enemy, float delta)
 	}
 	else
 	{
-		enemy->setMoveDirection(enemies::none);
+		enemy->setMoveDirection(enemies::Direction::none);
 	}
 }
 
 bool GameManager::enemyAbleToMove(enemies::BaseEnemy* enemy, enemies::Direction direction)
 {
-	if (enemy->getState() != enemies::enabled)
+	if (enemy->getState() != enemies::drawn)
 		return false;
 	auto position = enemy->getSprite()->getPosition();
 	auto size = enemy->getSprite()->getContentSize();
@@ -270,7 +279,7 @@ bool GameManager::enemyAbleToMove(enemies::BaseEnemy* enemy, enemies::Direction 
 
 
 	if (curCoord.y >= 0 && curCoord.y < h && curCoord.x >= 0 && curCoord.x < w && 
-		this->levelData[curCoord.y][curCoord.x] == blockTypes::road && 
+		this->levelData[curCoord.y][curCoord.x] == BlockTypes::road && 
 		enemy->getPrevDirection() != direction)
 	{
 		res = true;
@@ -314,7 +323,7 @@ bool GameManager::readMap(std::ifstream& levelFile)
 {
 	int rows, cols;
 	levelFile >> rows >> cols;
-	this->levelData = std::vector< std::vector<blockTypes> >(rows, std::vector<blockTypes>(cols));
+	this->levelData = std::vector< std::vector<BlockTypes> >(rows, std::vector<BlockTypes>(cols));
 
 	for (int i = 0; i < rows; i++)
 	{
@@ -377,5 +386,6 @@ void GameManager::unloadCurrentLevel()
 	currentWave = -1;
 	levelData.clear();
 	enemies.clear();
+	defences.clear();
 	waves.clear();
 }

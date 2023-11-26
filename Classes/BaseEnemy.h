@@ -1,3 +1,4 @@
+#pragma once
 #include "cocos2d.h"
 #include "Tower.h"
 
@@ -6,7 +7,7 @@ USING_NS_CC;
 namespace enemies 
 {
 	const enum Direction {none = 0, up = 1, right = 2, down = 3, left = 4};
-	const enum State { disabled = 0, drawn = 1, enabled = 2 };
+	const enum State { disabled = 0, drawn = 1, enabled = 2, dead = 3 };
 
 	class BaseEnemy
 	{

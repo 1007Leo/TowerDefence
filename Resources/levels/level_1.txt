@@ -2,9 +2,15 @@
 
 -map
 5 6
-s w r r r w
+s r r w w w
 r w r m r w
+r m r w r w
 r w r w r w
+r r r w r t
+
+s m r r w w
+r w r m r w
+m m r w r w
 r w r w r w
 r r r w r t
 
@@ -21,12 +27,14 @@ r r r w r t
 -wave
 0.5
 0.5
-0 3 2 5 
+0 0 10 0
+// 0 3 2 5 
 // interval between wave in seconds
 // interval between enemies in seconds
 //(baseEnemy) (normalEnemy) (thickEnemy) (fastEnemy) count
 
 -wave
 0.5
-0.5
-0 0 5 1
+4
+0 2 0 0
+//0 0 5 1

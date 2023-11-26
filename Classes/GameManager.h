@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -6,9 +7,9 @@
 #include <memory>
 
 #include "Enemies.h"
-//#include "BaseTurret.h"
+#include "BaseTurret.h"
 
-const enum blockTypes { unknown = 0, wall = 'w', mount = 'm', road = 'r', tower = 't' };
+const enum BlockTypes { unknown = 0, wall = 'w', mount = 'm', road = 'r', tower = 't' };
 
 struct Wave
 {
@@ -34,9 +35,9 @@ public:
 
 	Tower* getTower();
 	Point getEnemyStart();
-	std::vector< std::vector<blockTypes> >& getCurrentLevelMatrix();
+	std::vector< std::vector<BlockTypes> >& getCurrentLevelMatrix();
 	std::list< std::unique_ptr<enemies::BaseEnemy> > & getEnemies();
-	//std::list< std::unique_ptr<enemies::BaseTurret> >& getDefence();
+	std::list< std::unique_ptr<defences::BaseTurret> >& getDefences();
 	std::vector< Wave >& getWaves();
 	int getCurrentWave();
 	bool isLevelInProgress();
@@ -49,9 +50,9 @@ private:
 	int currentWave = -1;
 	int currentLevel = 0;
 	bool levelInProgress = false;
-	std::vector< std::vector<blockTypes> > levelData;
+	std::vector< std::vector<BlockTypes> > levelData;
 	std::list< std::unique_ptr<enemies::BaseEnemy> > enemies;
-	//std::list< std::unique_ptr<enemies::BaseTurret> > defence;
+	std::list< std::unique_ptr<defences::BaseTurret> > defences;
 	std::vector< Wave > waves;
 
 	void updateEnemy(enemies::BaseEnemy* enemy, float delta);

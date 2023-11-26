@@ -29,6 +29,11 @@ enemies::State enemies::BaseEnemy::getState()
 	return this->state;
 }
 
+double enemies::BaseEnemy::getHealth()
+{
+	return this->health;
+}
+
 double enemies::BaseEnemy::getSpeed()
 {
 	return this->speed;
@@ -37,6 +42,15 @@ double enemies::BaseEnemy::getSpeed()
 void enemies::BaseEnemy::setState(enemies::State state)
 {
 	this->state = state;
+}
+
+void enemies::BaseEnemy::setHealth(double newHealth)
+{
+	this->health = newHealth;
+	if (this->health <= 0)
+	{
+		this->state = enemies::State::dead;
+	}
 }
 
 void enemies::BaseEnemy::setMoveDirection(Direction direction)

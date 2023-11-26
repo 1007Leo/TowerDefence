@@ -64,7 +64,7 @@ bool GameScene::setLevel(GameManager& gameManager)
 {
 
     this->removeAllChildren();
-    std::vector< std::vector<blockTypes> >& board = gameManager.getCurrentLevelMatrix();
+    std::vector< std::vector<BlockTypes> >& board = gameManager.getCurrentLevelMatrix();
     std::list< std::unique_ptr<enemies::BaseEnemy> >& enemies = gameManager.getEnemies();
 
     int rows = board.size(), cols = 0;
@@ -85,7 +85,7 @@ bool GameScene::setLevel(GameManager& gameManager)
     {
         for (int j = 0; j < cols; j++)
         {
-            blockTypes el = board[i][j];
+            BlockTypes el = board[i][j];
             switch (el)
             {
             case wall:
@@ -127,16 +127,27 @@ bool GameScene::setLevel(GameManager& gameManager)
 
 void GameScene::showHideEnemies()
 {
-    for (auto& enemy : gameManager.getEnemies())    
+    int deadCnt = 0;
+    std::list< std::unique_ptr<enemies::BaseEnemy> >& enemiesList = gameManager.getEnemies();
+    for (auto& enemy : enemiesList)
     {
-        if (enemy.get()->getState() == enemies::enabled)
+        if (enemy.get()->getState() == enemies::State::drawn)
         {
             enemy.get()->getSprite()->setZOrder(1);
         }
-        /*else
+        else if (enemy.get()->getState() == enemies::State::dead)
         {
             enemy.get()->getSprite()->setZOrder(-1);
-        }*/
+            deadCnt++;
+        }
+    }
+    if (deadCnt == enemiesList.size())
+    {
+        for (auto& enemy : enemiesList)
+        {
+            enemy.get()->setState(enemies::State::disabled);
+            this->removeChild(enemy.get()->getSprite());
+        }
     }
 }
 
@@ -174,8 +185,8 @@ void GameScene::update(float delta)
     if (gameManager.isLevelInProgress())
     {
         setNextWaveIfNoEnemies();
-        showHideEnemies();
         gameManager.update(delta);
+        showHideEnemies();
     }
     else
     {
@@ -197,7 +208,7 @@ bool GameScene::setNextWaveIfNoEnemies()
 {
     for (auto& enemy : gameManager.getEnemies()) 
     {
-        if (enemy.get()->getState() != enemies::disabled)
+        if (enemy.get()->getState() != enemies::State::disabled)
             return true;
     }
 
@@ -211,7 +222,7 @@ bool GameScene::setNextWaveIfNoEnemies()
             setSpriteAtPos(enemy.get()->getSprite(), gameManager.getEnemyStart());
             enemy.get()->getSprite()->setTag(Tags::enemy);
             this->addChild(enemy.get()->getSprite(), -1);
-            enemy.get()->setState(enemies::drawn);
+            enemy.get()->setState(enemies::State::enabled);
     }
 
     float waveInterval = gameManager.getWaves()[gameManager.getCurrentWave()].waveInterval;
@@ -227,7 +238,7 @@ bool GameScene::setNextWaveIfNoEnemies()
                         DelayTime::create(enemyInterval * ind),
                         CallFunc::create([&]()
                             {
-                                enemy.get()->setState(enemies::enabled);
+                                enemy.get()->setState(enemies::State::drawn);
                             }
                     ));
                     runAction(enemySequence);
@@ -243,22 +254,40 @@ void GameScene::onMouseUp(Event* event)
 {
     EventMouse* e = (EventMouse*)event;
 
+    Size size = this->getChildByTag(Tags::block)->getContentSize();
+    float scale = this->getChildByTag(Tags::block)->getScale();
+    size.width *= scale;
+    size.height *= scale;
+    Point coord = gameManager.pixelToCoord({ e->getCursorX(), e->getCursorY() }, size);
 
-    for (auto& enemy : gameManager.getEnemies())
+    auto board = gameManager.getCurrentLevelMatrix();
+    int rows = board.size(), cols = board[0].size();
+    
+    if ((int)coord.y >= 0 && (int)coord.y < rows && (int)coord.x >= 0 && (int)coord.x < cols)
     {
-        if (enemy.get()->getState() == enemies::enabled)
+        if (board[(int)coord.y][(int)coord.x] == BlockTypes::mount)
         {
-            enemy.get()->setState(enemies::disabled);
-            this->removeChild(enemy.get()->getSprite());
-            break;
+            auto it = gameManager.getDefences().begin();
+            for (it; it != gameManager.getDefences().end(); it++)
+            {
+                Point itCoord = gameManager.pixelToCoord(it->get()->getSprite()->getPosition(), size);
+                if (itCoord == coord)
+                {
+                    this->removeChild(it->get()->getSprite());
+                    this->removeChild(it->get()->getHitSprite());
+                    gameManager.getDefences().erase(it);
+                    break;
+                }
+            }
+
+            defences::BaseTurret turret = defences::BaseTurret(std::min(size.width, size.height));
+            setSpriteAtPos(turret.getSprite(), coord);
+            setSpriteAtPos(turret.getHitSprite(), coord);
+            turret.getSprite()->setTag(Tags::defence);
+            turret.getHitSprite()->setTag(Tags::hitMark);
+            this->addChild(turret.getSprite(), 1);
+            this->addChild(turret.getHitSprite(), -1);
+            gameManager.getDefences().push_back(std::make_unique<defences::BaseTurret>(turret));
         }
     }
-
-    //const char* str = "Mouse Up detected, Key: ";
-
-    //float scale = findScale({40, 40}, gameManager.getCurrentLevelMatrix().size(), gameManager.getCurrentLevelMatrix()[0].size());
-
-    //Vec2 tmp = GameManager::pixelToCoord({ e->getCursorX(), e->getCursorY() }, { 40 * scale, 40 * scale });
-    const char* str = "Mouse Up detected, Key: ";
-    //str += tostr(e->getMouseButton());
 }
