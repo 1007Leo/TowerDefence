@@ -6,7 +6,7 @@ s r r w w w
 r w r m r w
 r m r w r w
 r w r w r w
-r r r w r t
+r r w w r t
 
 s m r r w w
 r w r m r w
@@ -27,7 +27,7 @@ r r r w r t
 -wave
 0.5
 0.5
-0 0 10 0
+0 3 0 0
 // 0 3 2 5 
 // interval between wave in seconds
 // interval between enemies in seconds

@@ -3,7 +3,7 @@
 defences::BaseTurret::BaseTurret()
 {
 	sprite = Sprite::create("sprites/defencesSprites/baseTurret.png");
-	hitSprite = Sprite::create("sprites/defencesSprites/hitSprites/continiousHitSprite.png");
+	hitSprite = Sprite::create("sprites/defencesSprites/hitSprites/normalHitSprite.png");
 	rotationSpeed = 70;
 	damage = 10;
 	attackRadius = 3 * 40;
@@ -12,7 +12,7 @@ defences::BaseTurret::BaseTurret()
 defences::BaseTurret::BaseTurret(float cellSize)
 {
 	sprite = Sprite::create("sprites/defencesSprites/baseTurret.png");
-	hitSprite = Sprite::create("sprites/defencesSprites/hitSprites/continiousHitSprite.png");
+	hitSprite = Sprite::create("sprites/defencesSprites/hitSprites/normalHitSprite.png");
 	rotationSpeed = 70;
 	damage = 10;
 	attackRadius = 3 * cellSize;
@@ -38,7 +38,7 @@ void defences::BaseTurret::update(std::list<std::unique_ptr<enemies::BaseEnemy>>
 	}
 	else
 	{
-		attack(enemy, delta);
+		this->attack(enemy, delta);
 	}
 }
 
@@ -129,7 +129,7 @@ void defences::BaseTurret::drawHitMark(enemies::BaseEnemy* enemy)
 {
 	if (enemy == nullptr || enemy->getState() != enemies::State::drawn)
 	{
-		this->hitSprite->setZOrder(-1);
+		this->hitSprite->setLocalZOrder(-1);
 		return;
 	}
 	float scale = enemy->getSprite()->getScale();
@@ -138,6 +138,6 @@ void defences::BaseTurret::drawHitMark(enemies::BaseEnemy* enemy)
 		  randY = RandomHelper::random_real(-5.0, 5.0) * scale;
 
 	this->hitSprite->setPosition({ enemyPos.x + randX, enemyPos.y + randY });
-	this->hitSprite->setZOrder(2);
+	this->hitSprite->setLocalZOrder(2);
 
 }

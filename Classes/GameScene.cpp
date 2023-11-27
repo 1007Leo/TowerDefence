@@ -23,10 +23,8 @@
  ****************************************************************************/
 
 #include <fstream>
-//#include <algorithm>
 
 #include "GameScene.h"
-//#include "MouseListener.h"
 #include "SimpleAudioEngine.h"
 
 USING_NS_CC;
@@ -49,7 +47,6 @@ bool GameScene::init()
         return false;
     }
 
-    //MouseListener mouseListener = MouseListener(this);
     auto _mouseListener = EventListenerMouse::create();
     _mouseListener->onMouseUp = CC_CALLBACK_1(GameScene::onMouseUp, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(_mouseListener, this);
@@ -62,7 +59,6 @@ bool GameScene::init()
 
 bool GameScene::setLevel(GameManager& gameManager)
 {
-
     this->removeAllChildren();
     std::vector< std::vector<BlockTypes> >& board = gameManager.getCurrentLevelMatrix();
     std::list< std::unique_ptr<enemies::BaseEnemy> >& enemies = gameManager.getEnemies();
@@ -133,11 +129,11 @@ void GameScene::showHideEnemies()
     {
         if (enemy.get()->getState() == enemies::State::drawn)
         {
-            enemy.get()->getSprite()->setZOrder(1);
+            enemy.get()->getSprite()->setLocalZOrder(1);
         }
         else if (enemy.get()->getState() == enemies::State::dead)
         {
-            enemy.get()->getSprite()->setZOrder(-1);
+            enemy.get()->getSprite()->setLocalZOrder(-1);
             deadCnt++;
         }
     }
@@ -230,10 +226,10 @@ bool GameScene::setNextWaveIfNoEnemies()
         DelayTime::create(waveInterval),
         CallFunc::create([&]()
             {
+                float enemyInterval = gameManager.getWaves()[gameManager.getCurrentWave()].enemyInterval;
                 int ind = 0;
                 for (auto& enemy : gameManager.getEnemies())
                 {
-                    float enemyInterval = gameManager.getWaves()[gameManager.getCurrentWave()].enemyInterval;
                     auto enemySequence = Sequence::createWithTwoActions(
                         DelayTime::create(enemyInterval * ind),
                         CallFunc::create([&]()
@@ -247,6 +243,51 @@ bool GameScene::setNextWaveIfNoEnemies()
             }
     ));
     runAction(waveSequence);
+    return true;
+}
+
+bool GameScene::setTurret(Point coord, Size size, defences::Types turretType)
+{
+    auto it = gameManager.getDefences().begin();
+    for (it; it != gameManager.getDefences().end(); it++)
+    {
+        Point itCoord = gameManager.pixelToCoord(it->get()->getSprite()->getPosition(), size);
+        if (itCoord == coord)
+        {
+            this->removeChild(it->get()->getSprite());
+            this->removeChild(it->get()->getHitSprite());
+            gameManager.getDefences().erase(it);
+            break;
+        }
+    }
+
+    switch (turretType)
+    {
+    case defences::Types::baseTurret:
+        gameManager.getDefences().push_back(std::make_unique<defences::BaseTurret>(defences::BaseTurret(std::min(size.width, size.height))));
+        break;
+    case defences::Types::machineGun:
+        gameManager.getDefences().push_back(std::make_unique<defences::MachineGun>(defences::MachineGun(std::min(size.width, size.height))));
+        break;
+    case defences::Types::gun:
+        gameManager.getDefences().push_back(std::make_unique<defences::Gun>(defences::Gun(std::min(size.width, size.height))));
+        break;
+    case defences::Types::artillery:
+        gameManager.getDefences().push_back(std::make_unique<defences::Artillery>(defences::Artillery(std::min(size.width, size.height))));
+        break;
+    default:
+        break;
+    }
+
+    defences::BaseTurret* turret = gameManager.getDefences().back().get();
+    
+    setSpriteAtPos(turret->getSprite(), coord);
+    setSpriteAtPos(turret->getHitSprite(), coord);
+    turret->getSprite()->setTag(Tags::defence);
+    turret->getHitSprite()->setTag(Tags::hitMark);
+    this->addChild(turret->getSprite(), 1);
+    this->addChild(turret->getHitSprite(), -1);
+    
     return true;
 }
 
@@ -267,27 +308,7 @@ void GameScene::onMouseUp(Event* event)
     {
         if (board[(int)coord.y][(int)coord.x] == BlockTypes::mount)
         {
-            auto it = gameManager.getDefences().begin();
-            for (it; it != gameManager.getDefences().end(); it++)
-            {
-                Point itCoord = gameManager.pixelToCoord(it->get()->getSprite()->getPosition(), size);
-                if (itCoord == coord)
-                {
-                    this->removeChild(it->get()->getSprite());
-                    this->removeChild(it->get()->getHitSprite());
-                    gameManager.getDefences().erase(it);
-                    break;
-                }
-            }
-
-            defences::BaseTurret turret = defences::BaseTurret(std::min(size.width, size.height));
-            setSpriteAtPos(turret.getSprite(), coord);
-            setSpriteAtPos(turret.getHitSprite(), coord);
-            turret.getSprite()->setTag(Tags::defence);
-            turret.getHitSprite()->setTag(Tags::hitMark);
-            this->addChild(turret.getSprite(), 1);
-            this->addChild(turret.getHitSprite(), -1);
-            gameManager.getDefences().push_back(std::make_unique<defences::BaseTurret>(turret));
+            setTurret(coord, size, defences::Types::gun);
         }
     }
 }

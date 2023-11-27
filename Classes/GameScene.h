@@ -33,6 +33,7 @@ private:
     GameManager gameManager;
 
     bool setNextWaveIfNoEnemies();
+    bool setTurret(Point coord, Size size, defences::Types turretType);
 
     void GameScene::onMouseUp(Event* event);
 };

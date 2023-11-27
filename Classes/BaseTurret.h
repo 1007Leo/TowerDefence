@@ -4,7 +4,7 @@
 
 namespace defences
 {
-	const enum Types {baseTurret = 0};
+	const enum Types {baseTurret = 0, machineGun = 1, gun = 2, artillery = 3};
 
 	class BaseTurret
 	{
@@ -15,14 +15,13 @@ namespace defences
 		Sprite* getSprite();
 		Sprite* getHitSprite();
 
-		void update(std::list< std::unique_ptr<enemies::BaseEnemy> >& enemiesList, float delta);
-
-		virtual void attack(enemies::BaseEnemy* enemy, float delta);
+		virtual void update(std::list< std::unique_ptr<enemies::BaseEnemy> >& enemiesList, float delta);
 	protected:
 		float rotationAngle = 0;
 		float rotationSpeed;
 
 		float damage;
+		float damageRadius;
 		float attackRadius;
 
 		Sprite* sprite;
@@ -33,6 +32,7 @@ namespace defences
 		bool rotateToTarget(enemies::BaseEnemy* enemy, float delta);
 		enemies::BaseEnemy* findNextTarget(std::list< std::unique_ptr<enemies::BaseEnemy> >& enemiesList);
 
+		virtual void attack(enemies::BaseEnemy* enemy, float delta);
 		virtual void drawHitMark(enemies::BaseEnemy* enemy);
 	};
 }
