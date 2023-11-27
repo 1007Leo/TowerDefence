@@ -4,7 +4,7 @@
 
 namespace defences
 {
-	const enum Types {baseTurret = 0, machineGun = 1, gun = 2, artillery = 3};
+	const enum Types {none = 0, baseTurret = 1, machineGun = 2, gun = 3, artillery = 4};
 
 	class BaseTurret
 	{

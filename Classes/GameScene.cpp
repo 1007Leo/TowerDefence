@@ -51,7 +51,45 @@ bool GameScene::init()
     _mouseListener->onMouseUp = CC_CALLBACK_1(GameScene::onMouseUp, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(_mouseListener, this);
 
+    auto _keyboardListener = EventListenerKeyboard::create();
+    _keyboardListener->onKeyPressed = CC_CALLBACK_2(GameScene::onKeyPressed, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(_keyboardListener, this);
+
     gameManager = GameManager();
+
+    //Vector< MenuItem* > menuItems;
+    //auto machineGunItem = MenuItemImage::create(
+    //    "sprites/selectorSprites/machineGun.png",
+    //    "sprites/selectorSprites/machineGunSelected.png",
+    //    CC_CALLBACK_1(GameScene::MGSelectCallback, this));
+    //auto gunItem = MenuItemImage::create(
+    //    "sprites/selectorSprites/gun.png",
+    //    "sprites/selectorSprites/gunSelected.png",
+    //    CC_CALLBACK_1(GameScene::gunSelectCallback, this));
+    //auto artilleryItem = MenuItemImage::create(
+    //    "sprites/selectorSprites/artillery.png",
+    //    "sprites/selectorSprites/artillerySelected.png",
+    //    CC_CALLBACK_1(GameScene::artillerySelectCallback, this));
+
+    //menuItems.pushBack(machineGunItem);
+    //menuItems.pushBack(gunItem);
+    //menuItems.pushBack(artilleryItem);
+
+    //auto visibleSize = Director::getInstance()->getVisibleSize();
+    //Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    //int i = 0;
+    //for (auto& item : menuItems)
+    //{
+    //    float x = origin.x + visibleSize.width * 0.8 + 40 * i;
+    //    float y = origin.y + visibleSize.height * 0.66;
+    //    item->setPosition(Vec2(x, y));
+    //}
+    //
+    ////auto menu = Menu::create(machineGunItem, NULL);
+    //auto menu = Menu::createWithArray(menuItems);
+    //menu->setPosition(Vec2::ZERO);
+    //this->addChild(menu, 1);
 
     this->scheduleUpdate();
     return true;
@@ -176,6 +214,47 @@ float GameScene::findScale(Size spriteSize, int rows, int cols)
     return scale;
 }
 
+void GameScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
+{
+    if (keyCode == EventKeyboard::KeyCode::KEY_1)
+    {
+        if (this->selectedTurret == defences::Types::none)
+            this->selectedTurret = defences::Types::machineGun;
+        else
+            this->selectedTurret = defences::Types::none;
+    }
+    else if (keyCode == EventKeyboard::KeyCode::KEY_2)
+    {
+        if (this->selectedTurret == defences::Types::none)
+            this->selectedTurret = defences::Types::gun;
+        else
+            this->selectedTurret = defences::Types::none;
+    }
+    else if (keyCode == EventKeyboard::KeyCode::KEY_3)
+    {
+        if (this->selectedTurret == defences::Types::none)
+            this->selectedTurret = defences::Types::artillery;
+        else
+            this->selectedTurret = defences::Types::none;
+    }
+
+
+    switch (keyCode)
+    {
+    case EventKeyboard::KeyCode::KEY_1:
+        this->selectedTurret = defences::Types::machineGun;
+        break;
+    case EventKeyboard::KeyCode::KEY_2:
+        this->selectedTurret = defences::Types::gun;
+        break;
+    case EventKeyboard::KeyCode::KEY_3:
+        this->selectedTurret = defences::Types::artillery;
+        break;
+    default:
+        break;
+    }
+}
+
 void GameScene::update(float delta)
 {
     if (gameManager.isLevelInProgress())
@@ -263,6 +342,9 @@ bool GameScene::setTurret(Point coord, Size size, defences::Types turretType)
 
     switch (turretType)
     {
+    case defences::Types::none:
+        return false;
+        break;
     case defences::Types::baseTurret:
         gameManager.getDefences().push_back(std::make_unique<defences::BaseTurret>(defences::BaseTurret(std::min(size.width, size.height))));
         break;
@@ -276,6 +358,7 @@ bool GameScene::setTurret(Point coord, Size size, defences::Types turretType)
         gameManager.getDefences().push_back(std::make_unique<defences::Artillery>(defences::Artillery(std::min(size.width, size.height))));
         break;
     default:
+        return false;
         break;
     }
 
@@ -308,7 +391,11 @@ void GameScene::onMouseUp(Event* event)
     {
         if (board[(int)coord.y][(int)coord.x] == BlockTypes::mount)
         {
-            setTurret(coord, size, defences::Types::gun);
+            if (this->selectedTurret != defences::Types::none)
+            {
+                setTurret(coord, size, this->selectedTurret);
+                this->selectedTurret = defences::Types::none;
+            }
         }
     }
 }

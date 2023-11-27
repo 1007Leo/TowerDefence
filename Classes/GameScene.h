@@ -22,8 +22,8 @@ public:
 
     static float findScale(Size spriteSize, int rows, int cols);
 
-    // a selector callback
-    //void menuCloseCallback(cocos2d::Ref* pSender);
+    void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
+    
 
     // implement the "static create()" method manually
     CREATE_FUNC(GameScene);
@@ -31,6 +31,7 @@ public:
     void update(float delta) override;
 private:
     GameManager gameManager;
+    defences::Types selectedTurret;
 
     bool setNextWaveIfNoEnemies();
     bool setTurret(Point coord, Size size, defences::Types turretType);
