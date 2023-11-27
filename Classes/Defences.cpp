@@ -8,6 +8,7 @@ defences::MachineGun::MachineGun()
 	damage = 10;
 	attackRadius = 3 * 40;
 	damageRadius = 0;
+	price = 100;
 }
 
 defences::MachineGun::MachineGun(float cellSize)
@@ -18,6 +19,7 @@ defences::MachineGun::MachineGun(float cellSize)
 	damage = 10;
 	attackRadius = 3 * cellSize;
 	damageRadius = 0;
+	price = 100;
 }
 
 defences::Gun::Gun()
@@ -30,6 +32,7 @@ defences::Gun::Gun()
 	reloadBuffer = reload;
 	attackRadius = 4 * 40;
 	damageRadius = 0;
+	price = 200;
 }
 
 defences::Gun::Gun(float cellSize)
@@ -42,6 +45,7 @@ defences::Gun::Gun(float cellSize)
 	reloadBuffer = reload;
 	attackRadius = 4 * cellSize;
 	damageRadius = 0;
+	price = 200;
 }
 
 void defences::Gun::attack(enemies::BaseEnemy* enemy, float delta)
@@ -69,6 +73,7 @@ defences::Artillery::Artillery()
 	reloadBuffer = reload;
 	attackRadius = 4 * 40;
 	damageRadius = 2 * 40;
+	price = 300;
 }
 
 defences::Artillery::Artillery(float cellSize)
@@ -81,6 +86,7 @@ defences::Artillery::Artillery(float cellSize)
 	reloadBuffer = reload;
 	attackRadius = 4 * cellSize;
 	damageRadius = 2 * cellSize;
+	price = 300;
 }
 
 void defences::Artillery::update(std::list<std::unique_ptr<enemies::BaseEnemy>>& enemiesList, float delta)

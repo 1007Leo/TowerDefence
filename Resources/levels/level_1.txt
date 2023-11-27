@@ -2,12 +2,6 @@
 
 -map
 5 6
-s r r w w w
-r w r m r w
-r m r w r w
-r w r w r w
-r r w w r t
-
 s m r r w w
 r w r m r w
 m m r w r w
@@ -20,6 +14,10 @@ r r r w r t
 // t - tower
 // m - mounting point for defences
 
+-startMoney
+1000
+//player money to buy turrets
+
 -tower
 100
 // health
@@ -27,14 +25,12 @@ r r r w r t
 -wave
 0.5
 0.5
-0 3 0 0
-// 0 3 2 5 
+0 3 2 5 
 // interval between wave in seconds
 // interval between enemies in seconds
 //(baseEnemy) (normalEnemy) (thickEnemy) (fastEnemy) count
 
 -wave
-0.5
 4
-0 2 0 0
-//0 0 5 1
+2
+0 0 5 1

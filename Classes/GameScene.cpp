@@ -57,39 +57,9 @@ bool GameScene::init()
 
     gameManager = GameManager();
 
-    //Vector< MenuItem* > menuItems;
-    //auto machineGunItem = MenuItemImage::create(
-    //    "sprites/selectorSprites/machineGun.png",
-    //    "sprites/selectorSprites/machineGunSelected.png",
-    //    CC_CALLBACK_1(GameScene::MGSelectCallback, this));
-    //auto gunItem = MenuItemImage::create(
-    //    "sprites/selectorSprites/gun.png",
-    //    "sprites/selectorSprites/gunSelected.png",
-    //    CC_CALLBACK_1(GameScene::gunSelectCallback, this));
-    //auto artilleryItem = MenuItemImage::create(
-    //    "sprites/selectorSprites/artillery.png",
-    //    "sprites/selectorSprites/artillerySelected.png",
-    //    CC_CALLBACK_1(GameScene::artillerySelectCallback, this));
+    /*auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();*/
 
-    //menuItems.pushBack(machineGunItem);
-    //menuItems.pushBack(gunItem);
-    //menuItems.pushBack(artilleryItem);
-
-    //auto visibleSize = Director::getInstance()->getVisibleSize();
-    //Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    //int i = 0;
-    //for (auto& item : menuItems)
-    //{
-    //    float x = origin.x + visibleSize.width * 0.8 + 40 * i;
-    //    float y = origin.y + visibleSize.height * 0.66;
-    //    item->setPosition(Vec2(x, y));
-    //}
-    //
-    ////auto menu = Menu::create(machineGunItem, NULL);
-    //auto menu = Menu::createWithArray(menuItems);
-    //menu->setPosition(Vec2::ZERO);
-    //this->addChild(menu, 1);
 
     this->scheduleUpdate();
     return true;
@@ -111,9 +81,6 @@ bool GameScene::setLevel(GameManager& gameManager)
         return false;
     }
     std::vector< std::vector<Sprite*> > levelSpriteMatrix(rows, std::vector<Sprite*>(cols));
-
-    const auto visibleSize = Director::getInstance()->getVisibleSize();
-    const Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     for (int i = 0; i < rows; i++)
     {
@@ -155,6 +122,10 @@ bool GameScene::setLevel(GameManager& gameManager)
 
     setSpriteAtPos(gameManager.getTower()->getSprite(), gameManager.getTower()->getPos());
     this->addChild(gameManager.getTower()->getSprite(), 1);
+
+    float scale = findScale(gameManager.getTower()->getSprite()->getContentSize(), rows, cols);
+
+    setLabels(scale);
 
     return true;
 }
@@ -216,29 +187,6 @@ float GameScene::findScale(Size spriteSize, int rows, int cols)
 
 void GameScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
-    if (keyCode == EventKeyboard::KeyCode::KEY_1)
-    {
-        if (this->selectedTurret == defences::Types::none)
-            this->selectedTurret = defences::Types::machineGun;
-        else
-            this->selectedTurret = defences::Types::none;
-    }
-    else if (keyCode == EventKeyboard::KeyCode::KEY_2)
-    {
-        if (this->selectedTurret == defences::Types::none)
-            this->selectedTurret = defences::Types::gun;
-        else
-            this->selectedTurret = defences::Types::none;
-    }
-    else if (keyCode == EventKeyboard::KeyCode::KEY_3)
-    {
-        if (this->selectedTurret == defences::Types::none)
-            this->selectedTurret = defences::Types::artillery;
-        else
-            this->selectedTurret = defences::Types::none;
-    }
-
-
     switch (keyCode)
     {
     case EventKeyboard::KeyCode::KEY_1:
@@ -262,6 +210,7 @@ void GameScene::update(float delta)
         setNextWaveIfNoEnemies();
         gameManager.update(delta);
         showHideEnemies();
+        updateLabels();
     }
     else
     {
@@ -325,6 +274,76 @@ bool GameScene::setNextWaveIfNoEnemies()
     return true;
 }
 
+bool GameScene::setLabels(float scale)
+{
+    labels.clear();
+
+    const auto visibleSize = Director::getInstance()->getVisibleSize();
+    const Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+    std::string currentMoney = "Current money: " + std::to_string((int)gameManager.getPlayerMoney());
+
+    auto moneyLabel = Label::createWithTTF(currentMoney, "fonts/Marker Felt.ttf", 16);
+    moneyLabel->setTag(Tags::labelMoney);
+    auto selectedTurretLabel = Label::createWithTTF("Selected turret: \nnone\n", "fonts/Marker Felt.ttf", 16 );
+    selectedTurretLabel->setTag(Tags::labelSelected);
+    auto turretsSelecorLabel = Label::createWithTTF("\nKeyboard keys\n1 - machinegun\n2 - regular gun\n3 - artillery", "fonts/Marker Felt.ttf", 16);
+    turretsSelecorLabel->setTag(Tags::label);
+
+    labels.push_back(moneyLabel);
+    labels.push_back(selectedTurretLabel);
+    labels.push_back(turretsSelecorLabel);
+
+    int ind = 0;
+    for (auto& label : labels)
+    {
+        label->setPosition(
+            Vec2(origin.x + visibleSize.width * 0.66 + label->getContentSize().width / 2 + 10,
+                 origin.y + visibleSize.height - label->getContentSize().height - 20 - label->getContentSize().height*ind));
+        this->addChild(label, 1);
+    }
+    return true;
+}
+
+void GameScene::updateLabels()
+{
+    for (auto& label : labels)
+    {
+        if (label->getTag() == Tags::labelMoney)
+        {
+            label->setString("Current money: " + std::to_string((int)gameManager.getPlayerMoney()));
+        }
+        if (label->getTag() == Tags::labelSelected)
+        {
+            std::string selectedStr = "";
+
+            switch (this->selectedTurret)
+            {
+            case defences::Types::none:
+                selectedStr = "None";
+                break;
+            case defences::Types::baseTurret:
+                selectedStr = "Base turret";
+                break;
+            case defences::Types::machineGun:
+                selectedStr = "Machinegun";
+                break;
+            case defences::Types::gun:
+                selectedStr = "Regular gun";
+                break;
+            case defences::Types::artillery:
+                selectedStr = "Artillery";
+                break;
+            default:
+                break;
+            }
+
+            label->setString("Selected turret: \n" + selectedStr + "\n");
+        }
+    }
+
+}
+
 bool GameScene::setTurret(Point coord, Size size, defences::Types turretType)
 {
     auto it = gameManager.getDefences().begin();
@@ -340,22 +359,24 @@ bool GameScene::setTurret(Point coord, Size size, defences::Types turretType)
         }
     }
 
+    float turretSize = std::min(size.width, size.height);
+
     switch (turretType)
     {
     case defences::Types::none:
         return false;
         break;
     case defences::Types::baseTurret:
-        gameManager.getDefences().push_back(std::make_unique<defences::BaseTurret>(defences::BaseTurret(std::min(size.width, size.height))));
+        gameManager.getDefences().push_back(std::make_unique<defences::BaseTurret>(defences::BaseTurret(turretSize)));
         break;
     case defences::Types::machineGun:
-        gameManager.getDefences().push_back(std::make_unique<defences::MachineGun>(defences::MachineGun(std::min(size.width, size.height))));
+        gameManager.getDefences().push_back(std::make_unique<defences::MachineGun>(defences::MachineGun(turretSize)));
         break;
     case defences::Types::gun:
-        gameManager.getDefences().push_back(std::make_unique<defences::Gun>(defences::Gun(std::min(size.width, size.height))));
+        gameManager.getDefences().push_back(std::make_unique<defences::Gun>(defences::Gun(turretSize)));
         break;
     case defences::Types::artillery:
-        gameManager.getDefences().push_back(std::make_unique<defences::Artillery>(defences::Artillery(std::min(size.width, size.height))));
+        gameManager.getDefences().push_back(std::make_unique<defences::Artillery>(defences::Artillery(turretSize)));
         break;
     default:
         return false;
@@ -363,6 +384,15 @@ bool GameScene::setTurret(Point coord, Size size, defences::Types turretType)
     }
 
     defences::BaseTurret* turret = gameManager.getDefences().back().get();
+    if (turret->getPrice() > gameManager.getPlayerMoney())
+    {
+        gameManager.getDefences().pop_back();
+        return false;
+    }
+    else
+    {
+        gameManager.setPlayerMoney(gameManager.getPlayerMoney() - turret->getPrice());
+    }
     
     setSpriteAtPos(turret->getSprite(), coord);
     setSpriteAtPos(turret->getHitSprite(), coord);
@@ -393,8 +423,8 @@ void GameScene::onMouseUp(Event* event)
         {
             if (this->selectedTurret != defences::Types::none)
             {
-                setTurret(coord, size, this->selectedTurret);
-                this->selectedTurret = defences::Types::none;
+                if (setTurret(coord, size, this->selectedTurret))
+                    this->selectedTurret = defences::Types::none;
             }
         }
     }

@@ -51,6 +51,10 @@ bool GameManager::loadLevel(int level)
 			{
 				readTower(levelFile);
 			}
+			else if (tag == "-startMoney")
+			{
+				levelFile >> this->playerMoney;
+			}
 		}
 		
 		levelFile.close();
@@ -175,16 +179,27 @@ bool GameManager::isLevelInProgress()
 	return this->levelInProgress;
 }
 
+float GameManager::getPlayerMoney()
+{
+	return this->playerMoney;
+}
+
+void GameManager::setPlayerMoney(float money)
+{
+	this->playerMoney = money;
+}
+
 void GameManager::update(float delta)
 {
-	for (auto& enemy : enemies)
-	{
-		updateEnemy(enemy.get(), delta);
-	}
 	for (auto& turret : defences)
 	{
 		turret.get()->update(enemies, delta);
 	}
+	for (auto& enemy : enemies)
+	{
+		updateEnemy(enemy.get(), delta);
+	}
+	
 	objTower.update();
 }
 
@@ -192,6 +207,12 @@ void GameManager::updateEnemy(enemies::BaseEnemy* enemy, float delta)
 {
 	if (enemy->getState() != enemies::drawn)
 	{
+		if (enemy->getState() == enemies::dead)
+		{
+			this->playerMoney += enemy->getPoints();
+			enemy->setPoints(0);
+		}
+			
 		return;
 	}
 	enemies::Direction moveDirection = enemy->getMoveDirection();

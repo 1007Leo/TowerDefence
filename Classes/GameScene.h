@@ -7,7 +7,7 @@
 
 USING_NS_CC;
 
-const enum Tags { block = 0, enemy = 1, defence = 2, hitMark = 3};
+const enum Tags { block = 0, enemy = 1, defence = 2, hitMark = 3, label = 4, labelMoney = 5, labelSelected = 6};
 
 class GameScene : public cocos2d::Scene
 {
@@ -32,8 +32,11 @@ public:
 private:
     GameManager gameManager;
     defences::Types selectedTurret;
+    std::list <Label*> labels;
 
     bool setNextWaveIfNoEnemies();
+    bool setLabels(float scale);
+    void updateLabels();
     bool setTurret(Point coord, Size size, defences::Types turretType);
 
     void GameScene::onMouseUp(Event* event);

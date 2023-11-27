@@ -18,12 +18,16 @@ m m r w r r r r r w
 // t - tower
 // m - mounting point for defences
 
+-startMoney
+1000
+//player money to buy turrets
+
 -tower
 100
 // health
 
 -wave
-0.5
+3
 0.5
 0 3 0 5 
 // interval between wave in seconds

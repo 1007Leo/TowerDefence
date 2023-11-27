@@ -14,9 +14,12 @@ namespace defences
 
 		Sprite* getSprite();
 		Sprite* getHitSprite();
+		float getPrice();
 
 		virtual void update(std::list< std::unique_ptr<enemies::BaseEnemy> >& enemiesList, float delta);
 	protected:
+		float price = 0;
+
 		float rotationAngle = 0;
 		float rotationSpeed;
 

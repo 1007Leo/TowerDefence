@@ -28,6 +28,11 @@ Sprite* defences::BaseTurret::getHitSprite()
 	return this->hitSprite;
 }
 
+float defences::BaseTurret::getPrice()
+{
+	return this->price;
+}
+
 void defences::BaseTurret::update(std::list<std::unique_ptr<enemies::BaseEnemy>>& enemiesList, float delta)
 {
 	enemies::BaseEnemy* enemy = findNextTarget(enemiesList);

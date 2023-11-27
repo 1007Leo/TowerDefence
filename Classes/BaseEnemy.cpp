@@ -29,14 +29,19 @@ enemies::State enemies::BaseEnemy::getState()
 	return this->state;
 }
 
-double enemies::BaseEnemy::getHealth()
+float enemies::BaseEnemy::getHealth()
 {
 	return this->health;
 }
 
-double enemies::BaseEnemy::getSpeed()
+float enemies::BaseEnemy::getSpeed()
 {
 	return this->speed;
+}
+
+float enemies::BaseEnemy::getPoints()
+{
+	return this->points;
 }
 
 void enemies::BaseEnemy::setState(enemies::State state)
@@ -61,6 +66,11 @@ void enemies::BaseEnemy::setMoveDirection(Direction direction)
 void enemies::BaseEnemy::setPrevDirection(Direction direction)
 {
 	prev = direction;
+}
+
+void enemies::BaseEnemy::setPoints(float points)
+{
+	this->points = points;
 }
 
 void enemies::BaseEnemy::attack(Tower* tower, float delta)

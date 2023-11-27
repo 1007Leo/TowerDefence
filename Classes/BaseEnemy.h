@@ -19,15 +19,16 @@ namespace enemies
 		Direction getMoveDirection();
 		Direction getPrevDirection();
 		State getState();
-		double getHealth();
-		double getDamage();
-		double getSpeed();
-		double getPoints();
+		float getHealth();
+		float getDamage();
+		float getSpeed();
+		float getPoints();
 
 		void setState(State state);
 		void setHealth(double newHealth);
 		void setMoveDirection(Direction direction);
 		void setPrevDirection(Direction direction);
+		void setPoints(float points);
 
 		void attack(Tower* tower, float delta);
 
@@ -35,9 +36,9 @@ namespace enemies
 		Sprite* sprite;
 
 		State state = disabled;
-		double health;
-		double damage;
-		double speed;
+		float health;
+		float damage;
+		float speed;
 		int points;
 
 		Direction moveDirection = enemies::none;

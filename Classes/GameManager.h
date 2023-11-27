@@ -41,6 +41,8 @@ public:
 	std::vector< Wave >& getWaves();
 	int getCurrentWave();
 	bool isLevelInProgress();
+	float getPlayerMoney();
+	void setPlayerMoney(float money);
 
 	void update(float delta);
 
@@ -50,6 +52,7 @@ private:
 	int currentWave = -1;
 	int currentLevel = 0;
 	bool levelInProgress = false;
+	float playerMoney = 0;
 	std::vector< std::vector<BlockTypes> > levelData;
 	std::list< std::unique_ptr<enemies::BaseEnemy> > enemies;
 	std::list< std::unique_ptr<defences::BaseTurret> > defences;
